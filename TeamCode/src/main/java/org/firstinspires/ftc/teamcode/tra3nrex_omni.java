@@ -63,7 +63,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Main Drive v2024.10.23", group="Linear OpMode")
+@TeleOp(name="Main Drive v2024.11.7", group="Linear OpMode")
 public class tra3nrex_omni extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
@@ -72,7 +72,7 @@ public class tra3nrex_omni extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
-    private Servo arm = null;
+    private DcMotor arm = null;
     boolean servoToggle = false;
 
     @Override
@@ -84,7 +84,7 @@ public class tra3nrex_omni extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-        arm = hardwareMap.get(Servo.class,"ascent");
+        arm = hardwareMap.get(DcMotor.class,"ascent");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -116,10 +116,13 @@ public class tra3nrex_omni extends LinearOpMode {
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
             double yaw     =  gamepad1.right_stick_x;
+            double servoPos = 0;
             if(gamepad1.left_bumper) {
-                servoToggle = false;
+                servoPos = -.5;
             } else if(gamepad1.right_bumper) {
-                servoToggle = true;
+                servoPos = .5;
+            } else {
+                servoPos = 0;
             }
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
@@ -128,7 +131,7 @@ public class tra3nrex_omni extends LinearOpMode {
             double rightFrontPower = axial - lateral - yaw;
             double leftBackPower   = axial - lateral + yaw;
             double rightBackPower  = axial + lateral - yaw;
-            double servoPos = servoToggle?1:0;
+            // double servoPos = servoToggle?.5:-.5;
 
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
@@ -167,7 +170,7 @@ public class tra3nrex_omni extends LinearOpMode {
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
-            arm.setPosition(servoPos);
+            arm.setPower(servoPos);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
