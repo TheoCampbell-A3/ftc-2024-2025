@@ -54,7 +54,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Park Only - INCOMPLETE", group="Robot")
+@Autonomous(name="Main Park v2024.11.16", group="Robot")
 
 public class tra3nrex_auto_parkonly extends LinearOpMode {
 
@@ -67,7 +67,7 @@ public class tra3nrex_auto_parkonly extends LinearOpMode {
     private ElapsedTime     runtime = new ElapsedTime();
 
 
-    static final double     FORWARD_SPEED = 0.6;
+    static final double     FORWARD_SPEED = 1;
     static final double     TURN_SPEED    = 0.5;
 
     @Override
@@ -104,11 +104,11 @@ public class tra3nrex_auto_parkonly extends LinearOpMode {
         frontRightDrive.setPower(FORWARD_SPEED);
         backRightDrive.setPower(FORWARD_SPEED);
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 3.0)) {
+        while (opModeIsActive() && (runtime.seconds() < 0.8)) {
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
         }
-
+/*
         // Step 2:  Spin right for 1.3 seconds
         frontLeftDrive.setPower(TURN_SPEED);
         backLeftDrive.setPower(TURN_SPEED);
@@ -119,14 +119,14 @@ public class tra3nrex_auto_parkonly extends LinearOpMode {
             telemetry.addData("Path", "Leg 2: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
         }
-
+*/
         // Step 3:  Drive Backward for 1 Second
         frontLeftDrive.setPower(-FORWARD_SPEED);
-        backLeftDrive.setPower(-FORWARD_SPEED);
-        frontRightDrive.setPower(-FORWARD_SPEED);
+        backLeftDrive.setPower(FORWARD_SPEED);
+        frontRightDrive.setPower(FORWARD_SPEED);
         backRightDrive.setPower(-FORWARD_SPEED);
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 1.0)) {
+        while (opModeIsActive() && (runtime.seconds() < 0.4)) {
             telemetry.addData("Path", "Leg 3: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
         }
