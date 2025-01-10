@@ -32,7 +32,12 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * This file contains an example of a Linear "OpMode".
@@ -65,6 +70,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="Main Drive v2024.11.15", group="Linear OpMode")
 public class tra3nrex_omni extends LinearOpMode {
 
+    private static final Logger log = LoggerFactory.getLogger(tra3nrex_omni.class);
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFrontDrive = null;
@@ -72,7 +78,13 @@ public class tra3nrex_omni extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private DcMotor slide = null;
-    boolean servoToggle = false;
+    private DcMotor clawUp = null;
+    private Servo   clawExtend = null;
+    private Servo   clawL = null;
+    private Servo   clawR = null;
+    private float clawPivotPos = 0;
+    private float clawExtendPos = 0;
+    private boolean clawEnabled = false;
 
     @Override
     public void runOpMode() {
@@ -80,10 +92,14 @@ public class tra3nrex_omni extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "left_front_drive");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
+        leftBackDrive   = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-        slide = hardwareMap.get(DcMotor.class,"ascent");
+        rightBackDrive  = hardwareMap.get(DcMotor.class, "right_back_drive");
+        clawUp          = hardwareMap.get(DcMotor.class, "claw_pivot");
+        slide           = hardwareMap.get(DcMotor.class, "ascent");
+        clawExtend      = hardwareMap.get(Servo.class  , "claw_length");
+        clawL           = hardwareMap.get(Servo.class  , "claw_left");
+        clawR           = hardwareMap.get(Servo.class  , "claw_right");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -99,6 +115,8 @@ public class tra3nrex_omni extends LinearOpMode {
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        slide.setDirection(DcMotor.Direction.FORWARD);
+        clawUp.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
@@ -117,12 +135,41 @@ public class tra3nrex_omni extends LinearOpMode {
             double yaw     =  gamepad1.right_stick_x;
             double servoPos = 0;
             if(gamepad1.left_bumper) {
-                servoPos = -.5;
+                servoPos = -.8;
             } else if(gamepad1.right_bumper) {
-                servoPos = .5;
+                servoPos = .8;
             } else {
                 servoPos = 0;
             }
+            if(clawExtendPos <= 1)
+            clawExtendPos += gamepad1.dpad_up?.01:0;
+            if(clawExtendPos >= 0)
+            clawExtendPos += gamepad1.dpad_down?-.01:0;
+
+            clawExtend.setPosition(clawExtendPos);
+
+            if(gamepad1.a) {
+                clawL.setPosition(0.0);
+                clawR.setPosition(0.4);
+            } else if(gamepad1.b) {
+                clawL.setPosition(0.3);
+                clawR.setPosition(.1);
+            }
+
+            // 0 (dormant) to 350 (straight up)
+            if(clawPivotPos <= 350)
+            clawPivotPos += gamepad1.right_trigger*2;
+            if(clawPivotPos >= 0)
+            clawPivotPos += -gamepad1.left_trigger*2;
+
+            clawUp.setTargetPosition(Math.round(clawPivotPos));
+            //log.warn("Target Position: "+clawPivotPos);
+            if(clawPivotPos == 0 && !clawEnabled) {
+                clawUp.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                clawEnabled = true;
+            }
+
+
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -171,10 +218,15 @@ public class tra3nrex_omni extends LinearOpMode {
             rightBackDrive.setPower(rightBackPower);
             slide.setPower(servoPos);
 
+
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+            telemetry.addData("Claw pivot position:", clawUp.getCurrentPosition());
+            telemetry.addData("Claw target pivot:", clawPivotPos);
+            telemetry.addData("Claw target extend:", clawExtendPos);
+
             telemetry.update();
         }
     }}
