@@ -141,9 +141,9 @@ public class tra3nrex_omni extends LinearOpMode {
             } else {
                 servoPos = 0;
             }
-            if(clawExtendPos <= 1)
+            if(clawExtendPos <= .8)
             clawExtendPos += gamepad1.dpad_up?.01:0;
-            if(clawExtendPos >= 0)
+            if(clawExtendPos >= .1)
             clawExtendPos += gamepad1.dpad_down?-.01:0;
 
             clawExtend.setPosition(clawExtendPos);
@@ -217,6 +217,7 @@ public class tra3nrex_omni extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
             slide.setPower(servoPos);
+            clawUp.setPower(.5);
 
 
             // Show the elapsed game time and wheel power.
