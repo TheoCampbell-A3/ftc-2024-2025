@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -78,14 +80,16 @@ public class tra3nrex_omni extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private DcMotor slide = null;
-    private DcMotor clawUp = null;
+    private Servo   clawUp1 = null;
+    private Servo   clawUp2 = null;
     private Servo   clawExtend = null;
     private Servo   clawL = null;
     private Servo   clawR = null;
-    private float clawPivotPos = 0;
-    private float clawExtendPos = 0;
+    private float   clawPivotPos = 0;
+    private float   clawExtendPos = 0;
     private boolean clawEnabled = false;
 
+    @SuppressLint("SuspiciousIndentation")
     @Override
     public void runOpMode() {
 
@@ -95,7 +99,8 @@ public class tra3nrex_omni extends LinearOpMode {
         leftBackDrive   = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive  = hardwareMap.get(DcMotor.class, "right_back_drive");
-        clawUp          = hardwareMap.get(DcMotor.class, "claw_pivot");
+        clawUp1         = hardwareMap.get(Servo.class, "claw_pivot_L");
+        clawUp2         = hardwareMap.get(Servo.class, "claw_pivot_R");
         slide           = hardwareMap.get(DcMotor.class, "ascent");
         clawExtend      = hardwareMap.get(Servo.class  , "claw_length");
         clawL           = hardwareMap.get(Servo.class  , "claw_left");
@@ -116,7 +121,7 @@ public class tra3nrex_omni extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
-        clawUp.setDirection(DcMotor.Direction.FORWARD);
+
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
@@ -130,9 +135,9 @@ public class tra3nrex_omni extends LinearOpMode {
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x;
-            double yaw     =  gamepad1.right_stick_x;
+            double axial   = -gamepad2.left_stick_y/2;  // Note: pushing stick forward gives negative value
+            double lateral =  gamepad2.left_stick_x/2;
+            double yaw     =  gamepad2.right_stick_x/2;
             double servoPos = 0;
             if(gamepad1.left_bumper) {
                 servoPos = -.8;
@@ -142,9 +147,9 @@ public class tra3nrex_omni extends LinearOpMode {
                 servoPos = 0;
             }
             if(clawExtendPos <= .8)
-            clawExtendPos += gamepad1.dpad_up?.01:0;
+                clawExtendPos += gamepad1.dpad_up?.005:0;
             if(clawExtendPos >= .1)
-            clawExtendPos += gamepad1.dpad_down?-.01:0;
+                clawExtendPos += gamepad1.dpad_down?-.005:0;
 
             clawExtend.setPosition(clawExtendPos);
 
@@ -157,17 +162,10 @@ public class tra3nrex_omni extends LinearOpMode {
             }
 
             // 0 (dormant) to 350 (straight up)
-            if(clawPivotPos <= 350)
-            clawPivotPos += gamepad1.right_trigger*2;
+            if(clawPivotPos <= 1)
+                clawPivotPos += gamepad1.right_trigger*0.001;
             if(clawPivotPos >= 0)
-            clawPivotPos += -gamepad1.left_trigger*2;
-
-            clawUp.setTargetPosition(Math.round(clawPivotPos));
-            //log.warn("Target Position: "+clawPivotPos);
-            if(clawPivotPos == 0 && !clawEnabled) {
-                clawUp.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                clawEnabled = true;
-            }
+                clawPivotPos += -gamepad1.left_trigger*0.001;
 
 
 
@@ -217,14 +215,15 @@ public class tra3nrex_omni extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
             slide.setPower(servoPos);
-            clawUp.setPower(.5);
+            clawUp1.setPosition(clawPivotPos);
+            //clawUp2.setPosition(clawPivotPos);
+
 
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-            telemetry.addData("Claw pivot position:", clawUp.getCurrentPosition());
             telemetry.addData("Claw target pivot:", clawPivotPos);
             telemetry.addData("Claw target extend:", clawExtendPos);
 

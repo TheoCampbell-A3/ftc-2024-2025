@@ -30,10 +30,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+//import com.qualcomm.robotcore.
 
 /*
  * This OpMode illustrates the concept of driving a path based on time.
@@ -54,9 +54,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Main Park v2024.11.16", group="Robot")
+@Autonomous(name="silly :3", group="Robot")
 
-public class tra3nrex_auto_parkonly extends LinearOpMode {
+public class tra3nrex_auto_sillyu extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotor         frontLeftDrive   = null;
@@ -67,7 +67,7 @@ public class tra3nrex_auto_parkonly extends LinearOpMode {
     private ElapsedTime     runtime = new ElapsedTime();
 
 
-    static final double     FORWARD_SPEED = .3;
+    static final double     FORWARD_SPEED = 1;
     static final double     TURN_SPEED    = 0.5;
 
     @Override
@@ -98,29 +98,31 @@ public class tra3nrex_auto_parkonly extends LinearOpMode {
 
         // Step through each leg of the path, ensuring that the OpMode has not been stopped along the way.
 
-        // Step 1:  Drive backward for .8 seconds
-        frontLeftDrive.setPower(-FORWARD_SPEED);
-        backLeftDrive.setPower(-FORWARD_SPEED);
-        frontRightDrive.setPower(-FORWARD_SPEED);
-        backRightDrive.setPower(-FORWARD_SPEED);
+/*        // Step 1:  Drive forward for 3 seconds
+        frontLeftDrive.setPower(FORWARD_SPEED);
+        backLeftDrive.setPower(FORWARD_SPEED);
+        frontRightDrive.setPower(FORWARD_SPEED);
+        backRightDrive.setPower(FORWARD_SPEED);
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < 0.8)) {
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
         }
-/*
+*/
         // Step 2:  Spin right for 1.3 seconds
         frontLeftDrive.setPower(TURN_SPEED);
         backLeftDrive.setPower(TURN_SPEED);
         frontRightDrive.setPower(-TURN_SPEED);
         backRightDrive.setPower(-TURN_SPEED);
+
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 1.3)) {
+        while (opModeIsActive() && (runtime.seconds() < 25)) {
             telemetry.addData("Path", "Leg 2: %4.1f S Elapsed", runtime.seconds());
+
             telemetry.update();
         }
-*/
-        // Step 3:  Drive Backward for 1 Second
+
+/*        // Step 3:  Drive Backward for 1 Second
         frontLeftDrive.setPower(-FORWARD_SPEED);
         backLeftDrive.setPower(FORWARD_SPEED);
         frontRightDrive.setPower(FORWARD_SPEED);
@@ -130,7 +132,7 @@ public class tra3nrex_auto_parkonly extends LinearOpMode {
             telemetry.addData("Path", "Leg 3: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
         }
-
+*/
         // Step 4:  Stop
         frontLeftDrive.setPower(0);
         backLeftDrive.setPower(0);
